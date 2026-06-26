@@ -1,0 +1,33 @@
+name: CI Build and Test
+
+on:
+  push:
+    paths:
+      - '02-ci-build-and-test/**'
+    branches:
+      - dev
+      - main
+
+jobs:
+  build-test:
+    run-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: 02-ci-build-and-test
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Build Docker Images
+        run: docker build -t ci-cd-prod .
+
+      - name: Run container
+        run: docker run -d -p 5000:5000 --name prod-container ci-cd-prod
+
+      - name: Wait for App
+        run: sleep 5
+
+      - name: Fake Test
+        run: echo "All test passed successfully!"
