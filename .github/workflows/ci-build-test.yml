@@ -46,5 +46,7 @@ jobs:
       - name: Real health check
         run: curl -f http://localhost:5000
 
-      - name
+      - name: Cleanup containers
+        if: always()
+        run: docker stop prod-container && docker rm prod-container
         
