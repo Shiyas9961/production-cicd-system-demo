@@ -4,7 +4,7 @@ app = Flask(__name__)
 
 @app.route("/")
 def home():
-    raise Exception("App is Broken...!")
+    raise Exception("App is Broken!")
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
