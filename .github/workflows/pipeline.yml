@@ -2,6 +2,8 @@ name: Basic CI Pipeline
 
 on:
   push:
+    paths:
+      - '01-pipeline-foundation/**'
     branches:
       - main
       - dev
@@ -9,6 +11,11 @@ on:
 jobs:
   check:
     runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: 01-pipeline-foundation
+
 
     steps:
       - name: Checkout Code
