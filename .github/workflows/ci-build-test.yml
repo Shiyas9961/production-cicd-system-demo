@@ -5,7 +5,7 @@ on:
     paths:
       - '02-ci-build-test/**'
     branches:
-      - dev
+      - develop
       - main
 
 jobs:

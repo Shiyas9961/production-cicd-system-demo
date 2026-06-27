@@ -6,7 +6,7 @@ on:
       - '01-pipeline-foundation/**'
     branches:
       - main
-      - dev
+      - develop
 
 jobs:
   check:
