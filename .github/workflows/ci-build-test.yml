@@ -26,9 +26,6 @@ jobs:
       - name: Run container
         run: docker run -d -p 5000:5000 --name prod-container ci-cd-prod
 
-      - name: Wait for App
-        run: sleep 5
-
       - name: Wait for App (Fail is not ready)
         run: |
           for i in {1..10}; do
