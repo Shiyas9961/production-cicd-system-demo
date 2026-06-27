@@ -39,7 +39,6 @@ jobs:
           done
 
           echo "App failed to start"
-          docker logs 
           exit 1
 
       - name: Real health check
