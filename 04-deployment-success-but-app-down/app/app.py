@@ -9,6 +9,6 @@ app = Flask(__name__)
 
 @app.route("/")
 def home():
-    return "Application running with secrets management"
+    return "The Real Deployment with Self hosted platform"
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
