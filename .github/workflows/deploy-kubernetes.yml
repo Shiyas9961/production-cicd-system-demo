@@ -23,7 +23,11 @@ jobs:
 
       - name: Build Image With Containerd
         run: |
-          sudo nerdctl -n k8s.io build -t flask-k3s-app:latest .
+          sudo nerdctl -n k8s.io build -t flask-k8s-app:latest .
+
+      - name: Show Containerd Images
+        run: |
+          sudo nerdctl -n k8s.io images | grep flask
 
       - name: Deploy To K3s
         run: |
