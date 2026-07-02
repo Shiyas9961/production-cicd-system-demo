@@ -25,10 +25,6 @@ jobs:
         run: |
           sudo nerdctl -n k8s.io build -t flask-k3s-app:latest .
 
-      - name: Load Image Into Kind
-        run: kind load docker-image flask-k8s-app:latest
-        continue-on-error: true
-
       - name: Deploy To K3s
         run: |
           kubectl apply -f k8s/namespace.yml
