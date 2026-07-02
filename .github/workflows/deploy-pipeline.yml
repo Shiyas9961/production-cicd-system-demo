@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - '04-deployment-success-but-app-down/**'
+      - '.github/workflows/deploy-pipeline.yml'
     branches:
       - main
       - develop

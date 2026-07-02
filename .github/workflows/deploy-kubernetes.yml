@@ -1,0 +1,48 @@
+name: K8s Deployment
+
+on:
+  push:
+    paths:
+      - '05-k8s-deployment/**'
+      - '.github/workflows/k8s-deployment.yml'
+    branches:
+      - main
+      - develop
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+
+    defaults:
+      run:
+        working-directory: 05-k8s-deployment
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Build Image With Containerd
+        run: |
+          sudo nerdctl -n k8s.io build -t flask-k3s-app:latest .
+
+      - name: Load Image Into Kind
+        run: kind load docker-image flask-k8s-app:latest
+        continue-on-error: true
+
+      - name: Deploy To K3s
+        run: |
+          kubectl apply -f k8s/namespace.yml
+          kubectl apply -f k8s/deployment.yml
+          kubectl apply -f k8s/service.yml
+
+      - name: Wait For Rollout
+        run: |
+          kubectl rollout status deployment/flask-app -n devops-demo --timeout=120s
+
+      - name: Show Pods
+        run: |
+          kubectl get pods -n devops-demo -o wide
+
+      - name: Health Check
+        run: |
+          curl -f http://localhost:30080
