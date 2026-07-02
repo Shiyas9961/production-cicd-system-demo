@@ -4,7 +4,7 @@ on:
   push:
     paths:
       - '05-k8s-deployment/**'
-      - '.github/workflows/k8s-deployment.yml'
+      - '.github/workflows/deploy-kubernetes.yml'
     branches:
       - main
       - develop
