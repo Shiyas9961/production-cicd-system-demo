@@ -29,6 +29,10 @@ jobs:
         run: |
           curl -f "${{ vars.SONAR_HOST_URL }}/api/system/status"
 
+      - name: Disable Sonar cache
+        run: |
+          rm -rf ~/.sonar/cache
+
       - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@v5
         env:
