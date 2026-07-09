@@ -45,7 +45,7 @@ jobs:
 
       - name: Export image for trivy
         run: |
-          sudo nerdctl -n k8n.io save -o /tmp/$IMAGE_NAME.tar $IMAGE_NAME:$IMAGE_TAG
+          sudo nerdctl -n k8s.io save -o /tmp/$IMAGE_NAME.tar $IMAGE_NAME:$IMAGE_TAG
 
       - name: Trivy Image Scan
         run: |
