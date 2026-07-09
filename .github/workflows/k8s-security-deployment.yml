@@ -43,13 +43,18 @@ jobs:
         run: |
           sudo nerdctl -n k8s.io build -t $IMAGE_NAME:$IMAGE_TAG .
 
+      - name: Export image for trivy
+        run: |
+          sudo nerdctl -n k8n.io save -o /tmp/$IMAGE_NAME.tar $IMAGE_NAME:$IMAGE_TAG
+
       - name: Trivy Image Scan
         run: |
           sudo trivy image \
+            --input /tmp/$IMAGE_NAME.tar \
             --severity HIGH,CRITICAL \
             --exit-code 1 \
             --ignore-unfixed \
-            $IMAGE_NAME:$IMAGE_TAG
+            --scanners vuln
 
       - name: Deploy To K3s
         run: |
@@ -68,5 +73,10 @@ jobs:
       - name: Health Check
         run: |
           curl -f http://localhost:30080
+
+      - name: Cleanup Image Tar
+        if: always()
+        run: |
+          sudo rm -f /tmp/$IMAGE_NAME.tar
 
       
