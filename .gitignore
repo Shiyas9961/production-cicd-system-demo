@@ -10,3 +10,4 @@ env/
 logs/*.log
 .python-version
 .sonar/
+.scannerwork/

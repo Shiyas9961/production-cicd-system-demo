@@ -1,0 +1,53 @@
+name: Multi Runner K3s Deployment
+
+on:
+  push:
+    paths:
+      - '07-multi-runner-deployment/**'
+      - '.github/workflows/multi-runner-deployment.yml'
+    branches:
+      - main
+      - develop
+
+  workflow_dispatch:
+    
+permissions:
+  contents: read
+
+env:
+  APP_DIRECTORY: 07-multi-runner-deployment
+  IMAGE_NAME: flask-k3s-multi-runner-app
+  K8S_NAMESPACE: devops-demo
+  DEPLOYMENT_NAME: flask-app
+  CONTAINER_NAME: flask-app
+
+jobs:
+  # -------------------------------------------------------
+  # Job 1: SonarQube scan on the self-hosted runner
+  # -------------------------------------------------------
+  sonarqube-scan:
+    name: SonarQube Security Check
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Check Sonar Connection
+        run: |
+          curl --fail --show-error \
+            "${{ vars.SONAR_HOST_URL }}/api/system/status"
+
+      - name: Clear SonarQube cache
+        run: |
+          rm -rf "$HOME/.sonar/cache"
+
+      - name: Run SonarQube scan
+        uses: SonarSource/sonarqube-scan-action@v5
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL }}
+        with:
+          projectBaseDir: ${{ env.APP_DIRECTORY }}
+          args:
+            -Dsonar.qualitygate.wait=true
