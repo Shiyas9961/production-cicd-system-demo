@@ -16,14 +16,23 @@ WORKDIR /app
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 
 
-RUN groupadd -r appgroup \
-    && useradd -r -g appgroup -d /app -s /usr/sbin/nologin appuser
+RUN groupadd \
+      --system \
+      --gid 10001 \
+      appgroup \
+    && useradd \
+      --system \
+      --uid 10001 \
+      --gid appgroup \
+      --home-dir /app \
+      --shell /usr/sbin/nologin \
+      appuser
 
 COPY --from=builder /install /usr/local
 
-COPY --chown=appuser:appgroup . .
+COPY --chown=10001:10001 . .
 
-USER appuser
+USER 10001:10001
 
 EXPOSE 5000
 
