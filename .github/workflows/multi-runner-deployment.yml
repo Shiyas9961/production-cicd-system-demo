@@ -146,7 +146,7 @@ jobs:
 
       - name: Update Deployment Image
         env:
-          DEPLOY_IMAGE: ${{ needs.docker-build-push.image }}
+          DEPLOY_IMAGE: ${{ needs.docker-build-push.outputs.image }}
         run: |
           echo "Deploying image: ${DEPLOY_IMAGE}"
 
