@@ -5,24 +5,41 @@ metadata:
   namespace: devops-demo
 
 spec:
-  replicas: 2
+  replicas: 1
+
   selector:
     matchLabels:
       app: flask-app
 
   strategy:
     type: RollingUpdate
+    rollingUpdate:
+      maxAvailable: 0
+      maxSurge: 1
+
   template:
     metadata:
       labels:
         app: flask-app
+
     spec:
       containers:
         - name: flask-container
-          image: flask-k3s-security-app:latest
-          imagePullPolicy: Never
+          image: Shiyas9961/flask-k3s-multi-runner-app:latest
+          imagePullPolicy: Always
+
           ports:
-            - containerPort: 5000
+            - name: http
+              containerPort: 5000
+              protocol: TCP
+
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              limits: 256Mi
 
           readinessProbe:
             httpGet:
@@ -30,6 +47,8 @@ spec:
               port: 5000
             initialDelaySeconds: 5
             periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
 
           livenessProbe:
             httpGet:
@@ -37,3 +56,12 @@ spec:
               port: 5000
             initialDelaySeconds: 15
             periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
+
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            capabilities:
+              drop:
+                - ALL
