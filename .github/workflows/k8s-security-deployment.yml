@@ -1,0 +1,86 @@
+name: K8s Security Deployment
+
+on:
+  push:
+    paths:
+      - '06-k8s-deployment-security/**'
+      - '.github/workflows/k8s-security-deployment.yml'
+    branches:
+      - main
+      - develop
+
+env:
+  IMAGE_NAME: flask-k3s-security-app
+  IMAGE_TAG: latest
+
+jobs:
+  security-deploy:
+    runs-on: self-hosted
+
+    defaults:
+      run:
+        working-directory: 06-k8s-deployment-security
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Check SonarQube Connection
+        run: |
+          curl -f "${{ vars.SONAR_HOST_URL }}/api/system/status"
+
+      - name: Disable Sonar cache
+        run: |
+          rm -rf ~/.sonar/cache
+
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@v5
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL }}
+        with:
+          projectBaseDir: 06-k8s-deployment-security
+          args: >
+            -Dsonar.qualitygate.wait=true
+          
+      - name: Build Image With K3s Containerd
+        run: |
+          sudo nerdctl -n k8s.io build -t $IMAGE_NAME:$IMAGE_TAG .
+
+      - name: Export image for trivy
+        run: |
+          sudo nerdctl -n k8s.io save -o /tmp/$IMAGE_NAME.tar $IMAGE_NAME:$IMAGE_TAG
+
+      - name: Trivy Image Scan
+        run: |
+          sudo trivy image \
+            --input /tmp/$IMAGE_NAME.tar \
+            --severity HIGH,CRITICAL \
+            --exit-code 1 \
+            --ignore-unfixed \
+            --scanners vuln
+
+      - name: Deploy To K3s
+        run: |
+          kubectl apply -f k8s/namespace.yml
+          kubectl apply -f k8s/deployment.yml
+          kubectl apply -f k8s/service.yml
+
+      - name: Wait For Rollout
+        run: |
+          kubectl rollout status deployment/flask-app -n devops-demo
+
+      - name: Show Pods
+        run: |
+          kubectl get pods -n devops-demo -o wide
+
+      - name: Health Check
+        run: |
+          curl -f http://localhost:30080
+
+      - name: Cleanup Image Tar
+        if: always()
+        run: |
+          sudo rm -f /tmp/$IMAGE_NAME.tar
+
+      
