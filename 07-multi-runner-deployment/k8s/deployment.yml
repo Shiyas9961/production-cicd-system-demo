@@ -25,7 +25,7 @@ spec:
     spec:
       containers:
         - name: flask-container
-          image: Shiyas9961/flask-k3s-multi-runner-app:latest
+          image: docker.io/shiyas9961/flask-k3s-multi-runner-app:latest
           imagePullPolicy: Always
 
           ports:
